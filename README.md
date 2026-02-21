@@ -88,7 +88,7 @@ flow-icons-zed/
 ### Step 6 — Select your theme
 
 1. Open the Command Palette again
-2. Type and select **`theme selector: toggle`** or go to **Settings → Icon Theme**
+2. Type and select **`icon theme selector: toggle`** 
 3. Choose any of the **Flow** icon themes from the list
 
 That's it — you're all set.
