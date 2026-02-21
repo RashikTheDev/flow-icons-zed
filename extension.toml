@@ -1,0 +1,8 @@
+id = "flow-icons"
+name = "Flow Icons"
+description = "🌼 A brand new premium icon pack for Zed"
+version = "1.3.1"
+schema_version = 1
+authors = ["Thang Nguyen"]
+repository = "https://github.com/thang-nm/Flow-Icons"
+icon_themes = ["icon_themes/flow-icons.json"]
