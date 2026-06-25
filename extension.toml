@@ -1,7 +1,7 @@
 id = "flow-icons"
 name = "Flow Icons"
 description = "🌼 A brand new premium icon pack for Zed"
-version = "1.3.2"
+version = "2.0.3"
 schema_version = 1
 authors = ["Thang Nguyen"]
 repository = "https://github.com/thang-nm/Flow-Icons"
