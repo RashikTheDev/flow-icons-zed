@@ -49,6 +49,32 @@ function stripLightPrefix(iconKey) {
   return iconKey.startsWith("__") ? iconKey.slice(2) : iconKey;
 }
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// VS Code matches file and folder names case-insensitively, but Zed's lookup
+// is case-sensitive, so `LICENSE` or `Dockerfile` would miss the lowercase
+// keys Flow Icons ships. Add UPPER and Capitalized variants (also for just the
+// part before the first dot, e.g. `LICENSE.md`) without overriding any key the
+// extension already defines explicitly.
+function withCaseVariants(map) {
+  const result = { ...map };
+  for (const [key, value] of Object.entries(map)) {
+    const dot = key.indexOf(".");
+    const base = dot > 0 ? key.slice(0, dot) : key;
+    const rest = dot > 0 ? key.slice(dot) : "";
+    const variants = [
+      key.toUpperCase(),
+      capitalize(key),
+      base.toUpperCase() + rest,
+      capitalize(base) + rest,
+    ];
+    for (const variant of variants) {
+      if (!(variant in result)) result[variant] = value;
+    }
+  }
+  return result;
+}
+
 function buildDarkTheme(palette, theme) {
   const { iconDefinitions } = theme;
 
@@ -83,9 +109,9 @@ function buildDarkTheme(palette, theme) {
         palette,
       ),
     },
-    named_directory_icons,
-    file_stems: theme.fileNames,
-    file_suffixes: theme.fileExtensions,
+    named_directory_icons: withCaseVariants(named_directory_icons),
+    file_stems: withCaseVariants(theme.fileNames),
+    file_suffixes: withCaseVariants(theme.fileExtensions),
     file_icons,
   };
 }
@@ -136,9 +162,9 @@ function buildLightTheme(palette, theme) {
         iconsDir,
       ),
     },
-    named_directory_icons,
-    file_stems,
-    file_suffixes,
+    named_directory_icons: withCaseVariants(named_directory_icons),
+    file_stems: withCaseVariants(file_stems),
+    file_suffixes: withCaseVariants(file_suffixes),
     file_icons,
   };
 }
