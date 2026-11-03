@@ -51,24 +51,33 @@ function stripLightPrefix(iconKey) {
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-// VS Code matches file and folder names case-insensitively, but Zed's lookup
-// is case-sensitive, so `LICENSE` or `Dockerfile` would miss the lowercase
-// keys Flow Icons ships. Add UPPER and Capitalized variants (also for just the
-// part before the first dot, e.g. `LICENSE.md`) without overriding any key the
-// extension already defines explicitly.
-function withCaseVariants(map) {
-  const result = { ...map };
-  for (const [key, value] of Object.entries(map)) {
+// Extensions of file names that are conventionally UPPER or Capitalized
+// (README.md, LICENSE.txt, CHANGELOG.rst). "" covers names without one
+// (LICENSE, Dockerfile, Makefile).
+const CASED_NAME_EXTENSIONS = new Set([
+  "",
+  ".md",
+  ".markdown",
+  ".mdx",
+  ".txt",
+  ".rst",
+  ".adoc",
+]);
+
+// VS Code matches file names case-insensitively, but Zed's lookup is
+// case-sensitive, so `LICENSE` or `README.md` would miss the lowercase keys
+// Flow Icons ships. Add UPPER and Capitalized variants of the name before the
+// extension, only for names that are written that way in practice, without
+// overriding any key the extension already defines explicitly.
+function withCaseVariants(fileStems) {
+  const result = { ...fileStems };
+  for (const [key, value] of Object.entries(fileStems)) {
+    if (key.startsWith(".")) continue;
     const dot = key.indexOf(".");
     const base = dot > 0 ? key.slice(0, dot) : key;
-    const rest = dot > 0 ? key.slice(dot) : "";
-    const variants = [
-      key.toUpperCase(),
-      capitalize(key),
-      base.toUpperCase() + rest,
-      capitalize(base) + rest,
-    ];
-    for (const variant of variants) {
+    const ext = dot > 0 ? key.slice(dot) : "";
+    if (!CASED_NAME_EXTENSIONS.has(ext)) continue;
+    for (const variant of [base.toUpperCase() + ext, capitalize(base) + ext]) {
       if (!(variant in result)) result[variant] = value;
     }
   }
@@ -109,9 +118,9 @@ function buildDarkTheme(palette, theme) {
         palette,
       ),
     },
-    named_directory_icons: withCaseVariants(named_directory_icons),
+    named_directory_icons,
     file_stems: withCaseVariants(theme.fileNames),
-    file_suffixes: withCaseVariants(theme.fileExtensions),
+    file_suffixes: theme.fileExtensions,
     file_icons,
   };
 }
@@ -162,9 +171,9 @@ function buildLightTheme(palette, theme) {
         iconsDir,
       ),
     },
-    named_directory_icons: withCaseVariants(named_directory_icons),
+    named_directory_icons,
     file_stems: withCaseVariants(file_stems),
-    file_suffixes: withCaseVariants(file_suffixes),
+    file_suffixes,
     file_icons,
   };
 }
